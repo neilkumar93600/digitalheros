@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export const dynamic = "force-dynamic";
 
 export default async function AdminOverview() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Basic stats
   const [

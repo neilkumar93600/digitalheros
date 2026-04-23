@@ -34,10 +34,10 @@ export function StatsCard({ refreshTrigger = 0 }: StatsCardProps) {
 
       const totalRounds = scores?.length || 0;
       const avgScore = totalRounds > 0 
-        ? Math.round(scores.reduce((acc, curr) => acc + curr.score_value, 0) / totalRounds) 
+        ? Math.round(scores!.reduce((acc: number, curr: any) => acc + curr.score_value, 0) / totalRounds) 
         : 0;
       const bestScore = totalRounds > 0 
-        ? Math.min(...scores.map(s => s.score_value))
+        ? Math.min(...scores!.map((s: any) => s.score_value))
         : 0;
 
       const { count: entriesCount } = await supabase

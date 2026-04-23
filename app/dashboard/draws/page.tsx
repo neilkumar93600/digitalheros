@@ -42,7 +42,7 @@ export default function DrawsPage() {
         
       let avgScore = 0;
       if (scores && scores.length > 0) {
-        avgScore = scores.reduce((acc, curr) => acc + curr.score_value, 0) / scores.length;
+        avgScore = scores.reduce((acc: number, curr: any) => acc + curr.score_value, 0) / scores.length;
       }
       
       const { data: sub } = await supabase

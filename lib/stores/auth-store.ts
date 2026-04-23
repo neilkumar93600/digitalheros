@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { getSupabaseClient } from "@/lib/supabase/client";
-import type { User } from "@supabase/supabase-js";
+import type { User, Session } from "@supabase/supabase-js";
 type Profile = Record<string, any>;
 
 interface AuthState {
@@ -64,7 +64,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       }
 
       // Listen for auth changes
-      supabase.auth.onAuthStateChange(async (event, session) => {
+      supabase.auth.onAuthStateChange(async (event: any, session: Session | null) => {
         if (event === "SIGNED_IN" && session?.user) {
           const { data: profile, error: profileError } = await supabase
             .from("profiles")

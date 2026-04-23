@@ -16,6 +16,7 @@ import {
 import { authService as supabaseAuth } from "@/lib/supabase/services/auth";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
+import type { Session } from "@supabase/supabase-js";
 
 const PASSWORD_REQUIREMENTS = [
   { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
@@ -62,7 +63,7 @@ export default function ResetPasswordPage() {
       const supabase = getSupabaseClient();
       const {
         data: { session },
-      } = await supabase.auth.getSession();
+      } = (await supabase.auth.getSession()) as { data: { session: Session | null } };
       setHasSession(!!session);
       if (!session) setTokenExpired(true);
     };

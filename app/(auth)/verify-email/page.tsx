@@ -12,6 +12,7 @@ import {
 import { authService as supabaseAuth } from "@/lib/supabase/services/auth";
 import { useAuthStore } from "@/lib/stores/auth-store";
 import { getSupabaseClient } from "@/lib/supabase/client";
+import type { Session } from "@supabase/supabase-js";
 
 type VerificationState = "verifying" | "success" | "expired" | "error" | "pending";
 
@@ -45,7 +46,7 @@ export default function VerifyEmailPage() {
       const supabase = getSupabaseClient();
       const {
         data: { session },
-      } = await supabase.auth.getSession();
+      } = (await supabase.auth.getSession()) as { data: { session: Session | null } };
       if (session?.user) {
         setUser(session.user);
         setState("success");

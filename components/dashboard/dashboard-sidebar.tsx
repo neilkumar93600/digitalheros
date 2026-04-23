@@ -91,7 +91,7 @@ export function DashboardSidebar() {
   const isCollapsed = state === "collapsed"
 
   const groupedItems = navItems.reduce(
-    (acc, item) => {
+    (acc: Record<string, typeof navItems>, item) => {
       if (!acc[item.group]) acc[item.group] = []
       acc[item.group].push(item)
       return acc

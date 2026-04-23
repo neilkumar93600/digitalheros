@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { User } from "@supabase/supabase-js";
+import { User, Session } from "@supabase/supabase-js";
 import { getSupabaseClient } from "@/lib/supabase/client";
 
 const supabase = getSupabaseClient();
@@ -43,7 +43,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data }: { data: { session: Session | null } }) => {
+      const session = data.session;
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchProfile(session.user.id);
@@ -55,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event: any, session: Session | null) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchProfile(session.user.id);

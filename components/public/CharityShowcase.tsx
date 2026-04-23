@@ -4,7 +4,7 @@ import Link from "next/link";
 import { WordsPullUp } from "@/components/animations/WordsPullUp";
 
 export default async function CharityShowcase() {
-  const supabase = createClient();
+  const supabase = await createClient();
   
   // Get featured charities
   const { data: charities } = await supabase

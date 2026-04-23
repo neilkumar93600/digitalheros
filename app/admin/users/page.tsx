@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export const dynamic = "force-dynamic";
 
 export default async function AdminUsersPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   // Get all users with their subscriptions
   const { data: profiles } = await supabase

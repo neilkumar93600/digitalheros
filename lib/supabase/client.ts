@@ -1,6 +1,6 @@
 import { createBrowserClient } from "@supabase/ssr";
 
-let browserClient: any = null;
+let browserClient: ReturnType<typeof createBrowserClient> | null = null;
 
 function getSupabaseEnv() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

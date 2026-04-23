@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default async function CharitiesPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: charities } = await supabase
     .from("charities")
     .select("*")

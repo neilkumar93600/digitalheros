@@ -37,13 +37,13 @@ export default function ScoresPage() {
 
       if (error) throw error;
       
-      const loadedScores = data || [];
+      const loadedScores = (data as unknown as Score[]) || [];
       setScores(loadedScores);
 
       if (loadedScores.length > 0) {
         const total = loadedScores.length;
-        const best = Math.min(...loadedScores.map(s => s.score_value));
-        const avg = loadedScores.reduce((acc, curr) => acc + curr.score_value, 0) / total;
+        const best = Math.min(...loadedScores.map((s: Score) => s.score_value));
+        const avg = loadedScores.reduce((acc: number, curr: Score) => acc + curr.score_value, 0) / total;
         
         setStats({
           bestScore: best,
