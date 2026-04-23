@@ -7,7 +7,7 @@ import { Heart, Globe, Star, DollarSign, Calendar, Plus } from "lucide-react";
 export const dynamic = "force-dynamic";
 
 export default async function AdminCharitiesPage() {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // Get all charities with better data
   const { data: charities } = await supabase

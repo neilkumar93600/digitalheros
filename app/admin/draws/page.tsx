@@ -8,7 +8,7 @@ import { Trophy, Calendar, DollarSign, TrendingUp, Target, Gift } from "lucide-r
 export const dynamic = "force-dynamic";
 
 export default async function DrawsPage() {
-  const supabase = await createClient();
+  const supabase = createClient();
 
   // Get all draws with better data
   const { data: draws } = await supabase
