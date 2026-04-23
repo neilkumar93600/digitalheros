@@ -1,17 +1,8 @@
-import { Geist, Geist_Mono, Space_Grotesk, DM_Sans } from "next/font/google"
-
+import { barlow, instrumentSerif } from "./fonts"
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@/lib/utils";
-
-const dmSansHeading = DM_Sans({subsets:['latin'],variable:'--font-heading'});
-
-const spaceGrotesk = Space_Grotesk({subsets:['latin'],variable:'--font-sans'})
-
-const fontMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-})
+import { AuthProvider } from "@/lib/contexts/auth-context";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default function RootLayout({
   children,
@@ -22,10 +13,16 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", spaceGrotesk.variable, dmSansHeading.variable)}
+      className={`${barlow.variable} ${instrumentSerif.variable} antialiased dark`}
     >
-      <body>
-        <ThemeProvider>{children}</ThemeProvider>
+      <body className="bg-background text-foreground min-h-screen selection:bg-foreground selection:text-background">
+        <ThemeProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              {children}
+            </TooltipProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ide__executeCode",
+      "Bash(python3 -c ' *)",
+      "Bash(pdftotext *)",
+      "Skill(shadcn)",
+      "Bash(npm run *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(mkdir -p src/assets)",
+      "Bash(curl -sL \"https://motionsites.ai/assets/hero-finlytic-preview-CV9g0FHP.gif\" -o src/assets/feature-1.gif)",
+      "Bash(curl -sL \"https://motionsites.ai/assets/hero-wealth-preview-B70idl_u.gif\" -o src/assets/feature-2.gif)"
+    ]
+  }
+}

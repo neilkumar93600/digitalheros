@@ -170,11 +170,12 @@ ALTER TABLE public.winners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.prize_pools ENABLE ROW LEVEL SECURITY;
 
 -- PROFILES policies
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 CREATE POLICY "Users can view own profile"
     ON public.profiles FOR SELECT
-    USING (auth.uid() = user_id OR EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    USING (auth.uid() = user_id OR COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
 
 CREATE POLICY "Users can update own profile"
     ON public.profiles FOR UPDATE
@@ -185,6 +186,8 @@ CREATE POLICY "Users can insert own profile"
     WITH CHECK (auth.uid() = user_id);
 
 -- CHARITIES policies (public read, admin write)
+DROP POLICY IF EXISTS "Charities are viewable by everyone" ON public.charities;
+DROP POLICY IF EXISTS "Only admins can modify charities" ON public.charities;
 CREATE POLICY "Charities are viewable by everyone"
     ON public.charities FOR SELECT
     TO authenticated, anon
@@ -192,16 +195,15 @@ CREATE POLICY "Charities are viewable by everyone"
 
 CREATE POLICY "Only admins can modify charities"
     ON public.charities FOR ALL
-    USING (EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    USING (COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
 
 -- SUBSCRIPTIONS policies
+DROP POLICY IF EXISTS "Users can view own subscriptions" ON public.subscriptions;
+DROP POLICY IF EXISTS "Users can insert own subscriptions" ON public.subscriptions;
+DROP POLICY IF EXISTS "Admins can update subscriptions" ON public.subscriptions;
 CREATE POLICY "Users can view own subscriptions"
     ON public.subscriptions FOR SELECT
-    USING (auth.uid() = user_id OR EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    USING (auth.uid() = user_id OR COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
 
 CREATE POLICY "Users can insert own subscriptions"
     ON public.subscriptions FOR INSERT
@@ -209,16 +211,16 @@ CREATE POLICY "Users can insert own subscriptions"
 
 CREATE POLICY "Admins can update subscriptions"
     ON public.subscriptions FOR UPDATE
-    USING (EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    USING (COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
 
 -- SCORES policies
+DROP POLICY IF EXISTS "Users can view own scores" ON public.scores;
+DROP POLICY IF EXISTS "Users can insert own scores" ON public.scores;
+DROP POLICY IF EXISTS "Users can update own scores" ON public.scores;
+DROP POLICY IF EXISTS "Users can delete own scores" ON public.scores;
 CREATE POLICY "Users can view own scores"
     ON public.scores FOR SELECT
-    USING (auth.uid() = user_id OR EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    USING (auth.uid() = user_id OR COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
 
 CREATE POLICY "Users can insert own scores"
     ON public.scores FOR INSERT
@@ -233,60 +235,53 @@ CREATE POLICY "Users can delete own scores"
     USING (auth.uid() = user_id);
 
 -- DRAWS policies (public read results, admin manage)
+DROP POLICY IF EXISTS "Published draws are viewable by everyone" ON public.draws;
+DROP POLICY IF EXISTS "Only admins can modify draws" ON public.draws;
 CREATE POLICY "Published draws are viewable by everyone"
     ON public.draws FOR SELECT
     TO authenticated, anon
-    USING (status = 'published' OR status = 'completed' OR EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    USING (status = 'published' OR status = 'completed' OR COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
 
 CREATE POLICY "Only admins can modify draws"
     ON public.draws FOR ALL
-    USING (EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    USING (COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
 
 -- DRAW ENTRIES policies
+DROP POLICY IF EXISTS "Users can view own entries" ON public.draw_entries;
+DROP POLICY IF EXISTS "Only admins can manage entries" ON public.draw_entries;
 CREATE POLICY "Users can view own entries"
     ON public.draw_entries FOR SELECT
-    USING (auth.uid() = user_id OR EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    USING (auth.uid() = user_id OR COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
 
 CREATE POLICY "Only admins can manage entries"
     ON public.draw_entries FOR ALL
-    USING (EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    USING (COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
 
 -- WINNERS policies
+DROP POLICY IF EXISTS "Winners can view own winnings" ON public.winners;
+DROP POLICY IF EXISTS "Only admins can manage winners" ON public.winners;
 CREATE POLICY "Winners can view own winnings"
     ON public.winners FOR SELECT
-    USING (auth.uid() = user_id OR EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    USING (auth.uid() = user_id OR COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
 
 CREATE POLICY "Only admins can manage winners"
     ON public.winners FOR ALL
-    USING (EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    USING (COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
 
 -- PRIZE POOLS policies (public read published, admin all)
+DROP POLICY IF EXISTS "Published prize pools are viewable" ON public.prize_pools;
+DROP POLICY IF EXISTS "Only admins can modify prize pools" ON public.prize_pools;
 CREATE POLICY "Published prize pools are viewable"
     ON public.prize_pools FOR SELECT
     USING (EXISTS (
         SELECT 1 FROM public.draws d
         WHERE d.id = draw_id AND (d.status = 'published' OR d.status = 'completed')
-    ) OR EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    ) OR COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
 
 CREATE POLICY "Only admins can modify prize pools"
     ON public.prize_pools FOR ALL
-    USING (EXISTS (
-        SELECT 1 FROM public.profiles WHERE user_id = auth.uid() AND role = 'admin'
-    ));
+    USING (COALESCE((auth.jwt() -> 'user_metadata' ->> 'role'), 'user') = 'admin');
+
 
 -- ============================================
 -- TRIGGERS FOR UPDATED_AT

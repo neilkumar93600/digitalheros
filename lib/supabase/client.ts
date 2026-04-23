@@ -1,26 +1,24 @@
 import { createBrowserClient } from "@supabase/ssr";
 
-export function createClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+let browserClient: any = null;
 
-  if (!url || !key) {
+function getSupabaseEnv() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !anonKey) {
     throw new Error(
-      "Supabase URL and Anon Key are required. Please check your .env.local file."
+      "Missing Supabase environment variables. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY."
     );
   }
 
-  return createBrowserClient(url, key);
+  return { url, anonKey };
 }
 
-// Lazy initialization - only create when actually used
-let clientInstance: ReturnType<typeof createClient> | null = null;
+export function getSupabaseClient() {
+  if (browserClient) return browserClient;
+  const { url, anonKey } = getSupabaseEnv();
+  browserClient = createBrowserClient(url, anonKey);
+  return browserClient;
+}
 
-export const supabase = new Proxy({} as ReturnType<typeof createClient>, {
-  get(_, prop) {
-    if (!clientInstance) {
-      clientInstance = createClient();
-    }
-    return clientInstance[prop as keyof typeof clientInstance];
-  },
-});
